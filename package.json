@@ -1,7 +1,7 @@
 {
-  "name": "cube-sim",
+  "name": "sams-janky-cube",
   "version": "1.0.0",
-  "description": "Nuxt.js project",
+  "description": "Sam G's Janky Cube",
   "author": "Sam 'the man' Churchill <sam.churchill89@gmail.com>",
   "private": true,
   "engines": {
