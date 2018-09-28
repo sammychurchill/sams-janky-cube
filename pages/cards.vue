@@ -1,139 +1,145 @@
 <template>
   <section class="section">
     <div class="container">
-      <div class="columns">
-        <div class="column is-two-thirds">
-          <Card
-            v-for="(card, id) in filteredCards"
-            :key="id"
-            :card="card"
-            class="title"
+      <nav class="navbar is-transparent">
+        <div class="navbar-brand">
+          <a 
+            class="navbar-item"
           />
-        </div>
-        <div class="column">
-          <div 
-            :class="{ 'is-active': isOrderDropdownActive }"
-            class="dropdown is-pulled-right"
+          <a 
+            :class="{ 'is-active': burgerActive }"
+            class="navbar-burger"
+            role="button"
+            data-target="navbarExampleTransparentExample"
+            @click="burgerActive = !burgerActive"
           >
-            <div class="dropdown-trigger">
-              <button 
-                class="button" 
-                aria-haspopup="true" 
-                aria-controls="dropdown-menu"
-                @click="toggleOrderDropdown"
+            <span/>
+            <span/>
+            <span/>
+          </a>
+        </div>
+        <div 
+          :class="{ 'is-active': burgerActive }"
+          class="navbar-menu"
+        >
+          <!-- <div class="navbar-start" /> -->
+          <div class="navbar-end">
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a 
+                class="navbar-link"
               >
-                <span>Sort By</span>
-                <span class="icon is-small">
-                  <i 
-                    class="fas fa-angle-down" 
-                    aria-hidden="true"/>
-                </span>
-              </button>
-            </div>
-            <div 
-              id="dropdown-menu" 
-              class="dropdown-menu" 
-              role="menu">
-              <div class="dropdown-content">
+                Order By
+              </a>
+              <div class="navbar-dropdown is-boxed">
                 <a 
-                  class="dropdown-item"
-                  @click="sort('name'); toggleOrderDropdown()"
+                  class="navbar-item"
+                  @click="sort('name'); burgerActive = !burgerActive"
                 >
                   Name
                 </a>
                 <a 
-                  class="dropdown-item"
-                  @click="sort('rarity'); toggleOrderDropdown()"
+                  class="navbar-item"
+                  @click="sort('rarity'); burgerActive = !burgerActive"
                 >
                   Rarity
                 </a>
                 <a 
-                  class="dropdown-item"
-                  @click="sort('cmc'); toggleOrderDropdown()"
+                  class="navbar-item"
+                  @click="sort('cmc'); burgerActive = !burgerActive"
                 >
                   Mana Cost
                 </a>
                 <a 
-                  class="dropdown-item"
-                  @click="sort('colours'); toggleOrderDropdown()"
+                  class="navbar-item"
+                  @click="sort('colours'); burgerActive = !burgerActive"
                 >
                   Colour
                 </a>
               </div>
             </div>
           </div>
-          <div>
-            <br>
-            <br>
-            <br>
-            <h2 class="is-pulled-right">Filter Colours:</h2>
-            <br>
-            <br>
-            <nav class="level">
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="W" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'W')"
-                  >
-                  W
-                </label>
-              </div>
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="R" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'R')"
-                  >
-                  R
-                </label>
-              </div>
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="G" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'G')"
-                  >
-                  G
-                </label>
-              </div>
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="U" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'U')"
-                  >
-                  U
-                </label>
-              </div>
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="B" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'B')"
-                  >
-                  B
-                </label>
-              </div>
-              <div class="level-item has-text-centered">
-                <label class="checkbox">
-                  <input 
-                    ref="C" 
-                    type="checkbox"
-                    @change="colourCheckboxUpdated($event, 'C')"
-                  >
-                  C
-                </label>
-              </div>
-            </nav>
+        </div>
+      </nav>
+      <div class="columns">
+        <div class="column is-one-quarter">
+          <h3>Filter selected colours</h3>
+          <nav class="level is-mobile">
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="W" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'W')"
+                >
+                W
+              </label>
+            </div>
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="R" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'R')"
+                >
+                R
+              </label>
+            </div>
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="G" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'G')"
+                >
+                G
+              </label>
+            </div>
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="U" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'U')"
+                >
+                U
+              </label>
+            </div>
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="B" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'B')"
+                >
+                B
+              </label>
+            </div>
+            <div class="level-item">
+              <label class="checkbox">
+                <input 
+                  ref="C" 
+                  type="checkbox"
+                  @change="colourCheckboxUpdated($event, 'C')"
+                >
+                C
+              </label>
+            </div>
+          </nav>
+        </div>
+        <div class="column">
+          <div class="is-pulled-right">
+            <h3 class="">Stats:</h3>
+            <p>Nubmer of cards: {{ allCards.length }}</p>
+            <p>Displayed Cards: {{ filteredCards.length }}</p>
           </div>
         </div>
       </div>
+      <Card
+        v-for="(card, id) in filteredCards"
+        :key="id"
+        :card="card"
+        class="title"
+      />
     </div>
   </section>
 </template>
@@ -152,7 +158,8 @@ export default {
       filteredColours: [],
       size: "small",
       isOrderDropdownActive: false,
-      allCards: []
+      allCards: [],
+      burgerActive: false
     };
   },
   computed: {
