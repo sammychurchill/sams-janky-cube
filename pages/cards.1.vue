@@ -1,8 +1,67 @@
 <template>
   <section class="section">
     <div class="container">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <a 
+            class="navbar-item"
+          />
+          <a 
+            :class="{ 'is-active': burgerActive }"
+            class="navbar-burger"
+            role="button"
+            data-target="navbarExampleTransparentExample"
+            @click="burgerActive = !burgerActive"
+          >
+            <span/>
+            <span/>
+            <span/>
+          </a>
+        </div>
+        <div 
+          :class="{ 'is-active': burgerActive }"
+          class="navbar-menu"
+        >
+          <!-- <div class="navbar-start" /> -->
+          <div class="navbar-end">
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a 
+                class="navbar-link"
+              >
+                Order By
+              </a>
+              <div class="navbar-dropdown is-boxed">
+                <a 
+                  class="navbar-item"
+                  @click="sort('name'); burgerActive = !burgerActive"
+                >
+                  Name
+                </a>
+                <a 
+                  class="navbar-item"
+                  @click="sort('rarity'); burgerActive = !burgerActive"
+                >
+                  Rarity
+                </a>
+                <a 
+                  class="navbar-item"
+                  @click="sort('cmc'); burgerActive = !burgerActive"
+                >
+                  Mana Cost
+                </a>
+                <a 
+                  class="navbar-item"
+                  @click="sort('colours'); burgerActive = !burgerActive"
+                >
+                  Colour
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
       <div class="columns">
-        <div class="column is-one-third">
+        <div class="column is-one-quarter">
           <h3>Filter selected colours</h3>
           <nav class="level is-mobile">
             <div class="level-item">
@@ -75,7 +134,6 @@
           </div>
         </div>
       </div>
-      <OrderDropDown />
       <Card
         v-for="(card, id) in filteredCards"
         :key="id"
@@ -88,14 +146,12 @@
 
 <script>
 import Card from "~/components/Card.vue";
-import OrderDropDown from "~/components/OrderDropDown.vue";
 var jsonData = require("~/assets/json/cardData.json");
 var arraySort = require("array-sort");
 
 export default {
   components: {
-    Card,
-    OrderDropDown
+    Card
   },
   data() {
     return {
