@@ -75,7 +75,7 @@
           </div>
         </div>
       </div>
-      <OrderDropDown />
+      <OrderDropDown @sort="sort($event)"/>
       <Card
         v-for="(card, id) in filteredCards"
         :key="id"
