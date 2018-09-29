@@ -15,17 +15,12 @@ module.exports = {
           "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css",
         rel: "stylesheet"
       },
-      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" }
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico?v2" }
     ],
     script: [{ src: "https://use.fontawesome.com/releases/v5.1.0/js/all.js" }]
   },
   plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
   loading: { color: "#3B8070" },
-
-  server: {
-    port: 3000, // default: 3000
-    host: "0.0.0.0" // default: localhost
-  },
 
   build: {
     /*
