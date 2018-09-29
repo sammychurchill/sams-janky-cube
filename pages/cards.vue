@@ -70,14 +70,14 @@
         <div class="column">
           <div class="is-pulled-right">
             <h3 class="">Stats:</h3>
-            <p>Nubmer of cards: {{ allCards.length }}</p>
-            <p>Displayed Cards: {{ filteredCards.length }}</p>
+            <p>Nubmer of cards: {{ numAllCards }}</p>
+            <p>Displayed Cards: {{ numFilteredCards }}</p>
           </div>
-        </div>
+        </div> 
       </div>
-      <OrderDropDown @sort="sort($event)"/>
+      <OrderDropDown @sort="setCurrentSort($event)"/>
       <Card
-        v-for="(card, id) in filteredCards"
+        v-for="(card, id) in cards"
         :key="id"
         :card="card"
         class="title"
@@ -89,8 +89,7 @@
 <script>
 import Card from "~/components/Card.vue";
 import OrderDropDown from "~/components/OrderDropDown.vue";
-var jsonData = require("~/assets/json/cardData.json");
-var arraySort = require("array-sort");
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   components: {
@@ -99,59 +98,42 @@ export default {
   },
   data() {
     return {
-      filteredColours: [],
       size: "small",
-      isOrderDropdownActive: false,
-      allCards: [],
-      burgerActive: false
+      isOrderDropdownActive: false
     };
   },
   computed: {
-    filteredCards() {
-      console.log(this.filteredColours);
-      if (!this.filteredColours) {
-        return this.allCards;
-      }
-      const filteredCards = [];
-      this.allCards.forEach(card => {
-        let value = 0;
-        this.filteredColours.forEach(c => {
-          if (card.colours.includes(c)) {
-            value++;
-          }
-        });
-        if (value < card.colours.length) {
-          filteredCards.push(card);
-        }
-      });
-      return filteredCards;
-    }
+    ...mapGetters([
+      "selectedColours",
+      "cards",
+      "numAllCards",
+      "numFilteredCards"
+    ])
   },
   mounted() {
-    this.allCards = jsonData;
+    this.selectedColours.forEach(colour => {
+      this.$refs[colour].checked = true;
+    });
   },
   methods: {
-    sort(property) {
-      this.allCards = arraySort(this.allCards, property);
-    },
     toggleOrderDropdown() {
       this.isOrderDropdownActive = !this.isOrderDropdownActive;
     },
     colourCheckboxUpdated(e, ref) {
+      console.log(e);
       if (e.target.checked) {
-        this.filteredColours.push(ref);
+        this.addColour(ref);
       } else {
-        this.filteredColours = this.filteredColours.filter(el => {
-          return el !== ref;
-        });
+        this.removeColour(ref);
       }
-    }
+    },
+    setCurrentSort(e) {
+      this.sortCards(e);
+    },
+    ...mapMutations(["addColour", "sortCards", "removeColour"])
   }
 };
 </script>
 
 <style lang="scss" scoped>
-// .title {
-//   color: $info;
-// }
 </style>

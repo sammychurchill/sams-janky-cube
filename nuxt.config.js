@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: "SJC",
+    title: "SJC - Sam's Janky Cube",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -19,12 +19,13 @@ module.exports = {
     ],
     script: [{ src: "https://use.fontawesome.com/releases/v5.1.0/js/all.js" }]
   },
-
-  // css: [
-  //   'bulma'
-  // ],
-
+  plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
   loading: { color: "#3B8070" },
+
+  server: {
+    port: 3000, // default: 3000
+    host: "0.0.0.0" // default: localhost
+  },
 
   build: {
     /*

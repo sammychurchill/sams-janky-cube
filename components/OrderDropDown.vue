@@ -2,7 +2,7 @@
   <div class="rootDiv">
     <div 
       :class="{ 'is-active': dropDownActive }"
-      class="dropdown is-hoverable">
+      class="dropdown">
       <div class="dropdown-trigger">
         <button 
           class="button" 
