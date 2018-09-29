@@ -1,6 +1,7 @@
 <template>
   <section class="section">
     <div class="container">
+      <br>
       <div class="columns">
         <div class="column is-one-third">
           <h3>Filter selected colours</h3>
@@ -66,6 +67,7 @@
               </label>
             </div>
           </nav>
+          <OrderDropDown @sort="setCurrentSort($event)"/>
         </div>
         <div class="column">
           <div class="is-pulled-right">
@@ -75,7 +77,6 @@
           </div>
         </div> 
       </div>
-      <OrderDropDown @sort="setCurrentSort($event)"/>
       <Card
         v-for="(card, id) in cards"
         :key="id"

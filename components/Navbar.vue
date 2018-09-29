@@ -1,6 +1,6 @@
 <template>
   <section>
-    <nav class="navbar is-light">
+    <nav class="navbar is-light is-fixed-top">
       <div class="navbar-brand">
         <a 
           class="navbar-item"

@@ -1,11 +1,17 @@
 <template>
   <section>
-    <h2>
-      {{ card.name }} 
-    </h2>
-    <img 
-      :src="card.smallImage"
-    >
+    <div class="content">
+      <a 
+        :href="card.gatherer_uri" 
+        class="is-black"
+        target="_blank">
+        {{ card.name }} 
+      </a>
+      <br>
+      <img 
+        :src="card.smallImage"
+      >
+    </div>
   </section>
 </template>
 <script>
@@ -23,5 +29,8 @@ export default {
   mounted() {}
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
+a {
+  padding-bottom: 10%;
+}
 </style>

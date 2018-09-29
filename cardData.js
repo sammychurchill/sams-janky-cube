@@ -16,7 +16,8 @@ jsonData.cards.forEach(element => {
         colours: res.data.colors.length > 0 ? res.data.colors : ["C"],
         type_line: res.data.type_line,
         cmc: res.data.cmc,
-        edhrec_uri: res.data.related_uris.edhrec
+        edhrec_uri: res.data.related_uris.edhrec,
+        gatherer_uri: res.data.related_uris.gatherer
       });
     })
     .then(() => logStuff())
