@@ -21,6 +21,10 @@ module.exports = {
   },
   plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
   loading: { color: "#3B8070" },
+  modules: [
+    // provide path to the file with resources
+    ["nuxt-sass-resources-loader", "./assets/css/main.scss"]
+  ],
 
   build: {
     /*

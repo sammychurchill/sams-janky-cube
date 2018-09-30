@@ -7,7 +7,7 @@
         <button 
           class="button" 
           aria-haspopup="true" 
-          @click="dropDownActive = true"
+          @click="dropDownActive = !dropDownActive"
         >
           <span>Order By</span>
           <span class="icon is-small">

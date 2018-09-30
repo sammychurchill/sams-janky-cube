@@ -4,7 +4,9 @@
       <br>
       <div class="columns">
         <div class="column is-one-third">
-          <h3>Filter selected colours</h3>
+          <div class="content">
+            <h4>Filter selected colours</h4>
+          </div>
           <nav class="level is-mobile">
             <div class="level-item">
               <label class="checkbox">
