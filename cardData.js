@@ -5,14 +5,19 @@ let cardData = [];
 
 jsonData.cards.forEach(element => {
   axios
-    .get(`https://api.scryfall.com/cards/named?fuzzy=${element}`)
+    .get(
+      `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(
+        element.name
+      )}`
+    )
     .then(res => {
       cardData.push({
         name: res.data.name,
+        count: element.count,
         largeImage: res.data.image_uris.large,
         normalImage: res.data.image_uris.normal,
         smallImage: res.data.image_uris.small,
-        rarity: res.data.rarity,
+        rarity: element.rarity || res.data.rarity,
         colours: res.data.colors.length > 0 ? res.data.colors : ["C"],
         type_line: res.data.type_line,
         cmc: res.data.cmc,
