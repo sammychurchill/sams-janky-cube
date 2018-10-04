@@ -1,106 +1,111 @@
 <template>
   <div>
     <div 
-      ref="pageloader" 
+      ref="pageloader"
       class="pageloader">
-      <span class="title">Pass to the Left</span>
+      <span 
+        ref="pageLoaderText" 
+        class="title">Pass to the Left</span>
     </div>
-    <div class="field has-addons">
-      <p
+    <br>
+    <div class="buttons is-centered">
+      <span 
         v-for="player in players"
-        :key="player.id" 
-        class="control"
+        :key="player.id"
+        :class="[{'is-active': player.id === currentPlayerID}, {'is-loading': player.isLoading}]"
+        class="button is-small is-primary is-unselectable"
+        @click="currentPlayerID = player.id; hoveredCardID = null"
       >
-        <a 
-          :class="[{'is-active': player.id === currentPlayerID}, {'is-loading': player.isLoading}]"
-          class="button is-primary is-small"
-          @click="currentPlayerID = player.id; hoveredCardID = null"
-        >
-          {{ player.name }}
-        </a>
-      </p>
+        {{ player.name }}
+      </span>
     </div>
-    <div 
-      class="field"
-      @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
-      <input 
-        :checked="selectedCardsCheckboxChecked"
-        type="checkbox" 
-        name="selectedCardsCheckbox" 
-        class="switch is-small is-rtl"
-      >
-      <label for="selectedCardsCheckbox">Selected Cards</label>
-    </div>
-    <div class="columns is-mobile">
+    <div class="container">
       <div 
-        class="column is-three-fifths-mobile is-one-quarter-desktop"
-      >
-        <div v-if="selectedCardsCheckboxChecked">
-          <p
-            v-for="card in selectedCards(currentPlayerID)"
-            :key="card.id"
-            :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
-            class="subtitle is-size-7"
-            @mouseover="hoveredCardID = card.id"
-          >
-            {{ card.name }}
-          </p>
-        </div>
-        <div v-else>
-          <span
-            v-for="card in boosterCards(currentPlayerID)"
-            :key="card.id"
-            :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
-            class="subtitle is-size-7"
-            @mouseover="hoveredCardID = card.id"
-            @click="selectCard(card.id);$store.dispatch('draft/logAction')"
-          >
-            <span 
-              v-if="currentSelectedCard(currentPlayerID) === card.id"
-              class="icon"
-            >
-              <i class="fas fa-star"/>
-            </span>
-            {{ card.name }}
-            <br>
-          </span>
-        </div>
+        class="field"
+        @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
+        <input 
+          :checked="selectedCardsCheckboxChecked"
+          type="checkbox" 
+          name="selectedCardsCheckbox" 
+          class="switch is-small is-rtl is-unselectable"
+        >
+        <label for="selectedCardsCheckbox is-unselectable">Selected Cards</label>
       </div>
-      <div class="column">
-        <transition name="fade">
-          <div @click="hoveredCardID = null">
-            <img 
-              v-if="hoveredCardID" 
-              :src="getCardByID(hoveredCardID).normalImage"
-              height="400"
-              width="200"
+      <div class="columns is-mobile">
+        <div 
+          class="column is-three-fifths-mobile is-one-quarter-desktop"
+        >
+          <div v-if="selectedCardsCheckboxChecked">
+            <p
+              v-for="card in selectedCards(currentPlayerID)"
+              :key="card.id"
+              :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
+              class="subtitle is-size-7 is-unselectable card-list-item"
+              @mouseover="hoveredCardID = card.id"
             >
+              {{ card.name }}
+            </p>
           </div>
-        </transition>
+          <div v-else>
+            <span
+              v-for="card in boosterCards(currentPlayerID)"
+              :key="card.id"
+              :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
+              class="subtitle is-size-7 is-unselectable card-list-item"
+              @mouseover="hoveredCardID = card.id"
+              @click="selectCard(card.id);$store.dispatch('draft/logAction')"
+            >
+              <span 
+                v-if="currentSelectedCard(currentPlayerID) === card.id"
+                class="icon"
+              >
+                <i class="fas fa-star"/>
+              </span>
+              {{ card.name }}
+              <br>
+            </span>
+          </div>
+        </div>
+        <div class="column">
+          <transition name="fade">
+            <div @click="hoveredCardID = null">
+              <img 
+                v-if="hoveredCardID" 
+                :src="getCardByID(hoveredCardID).normalImage"
+                height="400"
+                width="200"
+              >
+            </div>
+          </transition>
+        </div>
       </div>
     </div>
-    <nav 
-      class="navbar is-fixed-bottom"
-    >
-      <div class="navbar-brand">
-        <div class="navbar-item">
-          <a 
-            :disabled="buttonDisabled"
-            class="button is-primary"
-          >
-            Pass Left
-          </a>
-        </div>
-        <div class="navbar-item">
-          <a
-            :disabled="buttonDisabled"
-            class="button is-primary"
-          >
-            Pass Right
-          </a>
-        </div>
+    <div class="container footer-button">
+      <div 
+        v-if="boosterCards(userPlayer).length > 0"
+        class="buttons is-centered">
+        <span
+          :disabled="buttonDisabled"
+          class="button is-small is-primary"
+          @click="passTurn('L')"
+        >
+          Pass Left
+        </span>
+        <span
+          :disabled="buttonDisabled"
+          class="button is-small is-primary"
+          @click="passTurn('R')"
+        >
+          Pass Right
+        </span>
       </div>
-    </nav>
+      <div
+        v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
+        class="button is-small is-primary is-centered"
+      >
+        Next Pack
+      </div>
+    </div>
   </div>
 </template>
 
@@ -118,7 +123,8 @@ export default {
       hoveredCardID: null,
       selectedCardID: null,
       selectedCardsCheckboxChecked: false,
-      passDirection: "l",
+      passDirections: ["L", "R"],
+      passIDX: 0,
       hasStarted: false
     };
   },
@@ -129,6 +135,9 @@ export default {
         this.currentPlayerID === this.userPlayer &&
         this.selectedCardsCheckboxChecked === false
       );
+    },
+    passDirection() {
+      return this.passDirections[this.passIDX];
     },
     ...mapGetters([
       "players",
@@ -149,16 +158,9 @@ export default {
     }
   },
   mounted() {
-    const pageloader = this.$refs.pageloader;
-    if (pageloader) {
-      pageloader.classList.toggle("is-active");
-      const pageloaderTimeout = setTimeout(function() {
-        pageloader.classList.toggle("is-active");
-        clearTimeout(pageloaderTimeout);
-      }, 3000);
-    }
+    console.log(this.boosterCards.length);
+    this.showPageLoader("Pass to the Left");
     this.userPlayer = 1;
-    // this.$store.dispatch("draft/CPUSelectCard", 5);
     if (!this.hasStarted) {
       this.hasStarted = true;
       for (let player of this.players) {
@@ -169,6 +171,27 @@ export default {
     }
   },
   methods: {
+    showPageLoader(text) {
+      const pageloader = this.$refs.pageloader;
+      if (pageloader) {
+        this.$refs.pageLoaderText.innerText = text;
+        pageloader.classList.toggle("is-active");
+        const pageloaderTimeout = setTimeout(function() {
+          pageloader.classList.toggle("is-active");
+          clearTimeout(pageloaderTimeout);
+        }, 3000);
+      }
+    },
+    passTurn(direction) {
+      if (direction.toUpperCase !== this.passDirection.toUpperCase) {
+        //fail modal
+        return;
+      }
+      // confirm modal
+      // this.passIDX = this.passIDX * -1 + 1; // for when no more boosters
+
+      this.showPageLoader("Pass to the Right");
+    },
     selectCard(cardID) {
       if (this.selectedCardID === cardID) {
         this.selectedCardID = null;
@@ -190,17 +213,29 @@ export default {
 };
 </script>
 
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
+<style scoped lang="sass">
+@import "~/assets/vars.sass"
 
-.navbar-brand {
+.fade-enter-active,
+.fade-leave-active 
+  transition: opacity 0.5s;
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ 
+  opacity: 0;
+
+
+.navbar-brand 
   margin-left: 15%;
   margin-bottom: 10%;
-}
+
+
+.button.is-small
+  border-color: $vapor-green;
+
+.footer-button
+  margin-top: 25%
+
+.card-list-item
+  margin-top: 5px
+  margin-bottom: 5px
 </style>

@@ -131,10 +131,16 @@ export const getters = {
     //this fires when cards are hovered over. Need to investigate
     const player = state.players[playerID];
     const boosterCardsArray = [];
-    state.boosters[player.currentBooster].forEach(cardID => {
-      boosterCardsArray.push(state.cards.filter(card => card.id === cardID)[0]);
-    });
-    return boosterCardsArray;
+    try {
+      for (let cardID of state.boosters[player.currentBooster]) {
+        boosterCardsArray.push(
+          state.cards.filter(card => card.id === cardID)[0]
+        );
+      }
+      return boosterCardsArray;
+    } catch (error) {
+      return [];
+    }
   },
   selectedCards: state => playerID => {
     return state.players[playerID].selectedCards.map(
@@ -270,10 +276,14 @@ function getCMCValue(card) {
 function getTimeoutSynergy(card1, card2) {
   return new Promise(resolve =>
     setTimeout(() => {
-      console.log(card1, card2);
+      nothing({ card1, card2 });
       resolve(33);
     }, 300)
   );
+}
+
+function nothing(o) {
+  return o;
 }
 
 // function synergyDBLookup(card1, card2) {

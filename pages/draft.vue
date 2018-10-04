@@ -1,15 +1,13 @@
 <template>
   <section class="section">
-    <div class="container">
-      <template v-if="isStarted">
-        <DraftStarted />
-      </template>
-      <template v-else>
-        <DraftInit 
-          @start="currentPlayer = currentPlayer"
-        />
-      </template>
-    </div>
+    <template v-if="isStarted">
+      <DraftStarted />
+    </template>
+    <template v-else>
+      <DraftInit 
+        @start="currentPlayer = currentPlayer"
+      />
+    </template>
   </section>
 </template>
 

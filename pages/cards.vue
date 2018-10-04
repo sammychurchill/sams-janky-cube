@@ -72,7 +72,7 @@
           <OrderDropDown @sort="setCurrentSort($event)"/>
         </div>
         <div class="column">
-          <div class="content is-pulled-right is-size-7-touch">
+          <div class="content is-pulled-right is-size-7-touch is-hidden-touch">
             <p class="is-small">Stats:</p>
             <p>Nubmer of cards: {{ numAllCards }}</p>
             <p>Displayed Cards: {{ numFilteredCards }}</p>
