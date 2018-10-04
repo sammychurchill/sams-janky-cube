@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = {
   /*
   ** Headers of the page
@@ -9,27 +11,29 @@ module.exports = {
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { hid: "description", name: "description", content: "Nuxt.js project" }
     ],
-    link: [
+    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico?v2" }],
+    script: [
       {
-        href:
-          "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css",
-        rel: "stylesheet"
-      },
-      { rel: "icon", type: "image/x-icon", href: "/favicon.ico?v2" }
-    ],
-    script: [{ src: "https://use.fontawesome.com/releases/v5.1.0/js/all.js" }]
+        src: "https://use.fontawesome.com/releases/v5.1.0/js/all.js"
+      }
+    ]
   },
-  plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
-  loading: { color: "#3B8070" },
-  modules: [
-    // provide path to the file with resources
-    ["nuxt-sass-resources-loader", "./assets/css/main.scss"]
+  css: [
+    // node.js module but we specify the pre-processor
+    { src: "~assets/main.sass", lang: "sass" },
+    // { src: 'bulma/bulma.sass', lang: 'sass' },
+    { src: "font-awesome/scss/font-awesome.scss", lang: "scss" }
   ],
+  // plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
+  loading: { color: "#3B8070" },
+  modules: [],
 
   build: {
-    /*
-    ** Run ESLint on save
-    */
+    postcss: {
+      plugins: {
+        "postcss-custom-properties": false
+      }
+    },
     extend(config, { isDev, isClient }) {
       if (isDev && isClient) {
         config.module.rules.push({

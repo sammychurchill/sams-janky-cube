@@ -72,8 +72,8 @@
           <OrderDropDown @sort="setCurrentSort($event)"/>
         </div>
         <div class="column">
-          <div class="is-pulled-right">
-            <h3 class="">Stats:</h3>
+          <div class="content is-pulled-right is-size-7-touch">
+            <p class="is-small">Stats:</p>
             <p>Nubmer of cards: {{ numAllCards }}</p>
             <p>Displayed Cards: {{ numFilteredCards }}</p>
           </div>
@@ -92,7 +92,8 @@
 <script>
 import Card from "~/components/Card.vue";
 import OrderDropDown from "~/components/OrderDropDown.vue";
-import { mapGetters, mapMutations } from "vuex";
+import { createNamespacedHelpers } from "vuex";
+const { mapGetters, mapMutations } = createNamespacedHelpers("cards");
 
 export default {
   components: {

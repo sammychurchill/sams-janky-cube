@@ -4,6 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 const _0398893b = () => import('../pages/cards.vue' /* webpackChunkName: "pages/cards" */).then(m => m.default || m)
+const _0402670e = () => import('../pages/draft.vue' /* webpackChunkName: "pages/draft" */).then(m => m.default || m)
 const _3df309ac = () => import('../pages/index.vue' /* webpackChunkName: "pages/index" */).then(m => m.default || m)
 
 
@@ -68,6 +69,11 @@ export function createRouter () {
 			path: "/cards",
 			component: _0398893b,
 			name: "cards"
+		},
+		{
+			path: "/draft",
+			component: _0402670e,
+			name: "draft"
 		},
 		{
 			path: "/",

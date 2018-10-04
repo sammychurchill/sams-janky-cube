@@ -3,7 +3,7 @@ var fs = require("fs");
 var axios = require("axios");
 let cardData = [];
 
-jsonData.cards.forEach(element => {
+jsonData.cards.forEach((element, count) => {
   axios
     .get(
       `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(
@@ -12,6 +12,7 @@ jsonData.cards.forEach(element => {
     )
     .then(res => {
       cardData.push({
+        id: count + 1, //probably should use card id
         name: res.data.name,
         count: element.count,
         largeImage: res.data.image_uris.large,

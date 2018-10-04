@@ -20,18 +20,20 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.2",
-    "array-sort": "^1.0.0",
     "axios": "^0.18.0",
     "bulma": "^0.7.1",
     "bulma-checkradio": "^2.1.0",
+    "bulma-pageloader": "^2.1.0",
     "bulma-switch": "^2.0.0",
     "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.0.0",
     "eslint-config-prettier": "^3.1.0",
     "eslint-plugin-prettier": "^2.7.0",
     "font-awesome": "^4.7.0",
     "nuxt": "^1.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
+    "sort-array": "^2.0.0",
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {

@@ -12,7 +12,6 @@ import { setContext, getLocation, getRouteData } from './utils'
 import { createStore } from './store.js'
 
 /* Plugins */
-import nuxt_plugin_localStorage_830ec59e from 'nuxt_plugin_localStorage_830ec59e' // Source: ../plugins/localStorage.js (ssr: false)
 
 
 // Component: <no-ssr>
@@ -152,9 +151,6 @@ async function createApp (ssrContext) {
   // Plugin execution
   
   
-  if (process.browser) { 
-    if (typeof nuxt_plugin_localStorage_830ec59e === 'function') await nuxt_plugin_localStorage_830ec59e(app.context, inject)
-  }
 
   // If server-side, wait for async component to be resolved first
   if (process.server && ssrContext && ssrContext.url) {
