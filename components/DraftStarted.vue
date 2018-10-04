@@ -47,7 +47,7 @@
           </p>
         </div>
         <div v-else>
-          <p
+          <span
             v-for="card in boosterCards(currentPlayerID)"
             :key="card.id"
             :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
@@ -62,7 +62,8 @@
               <i class="fas fa-star"/>
             </span>
             {{ card.name }}
-          </p>
+            <br>
+          </span>
         </div>
       </div>
       <div class="column">
