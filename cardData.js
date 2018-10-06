@@ -20,8 +20,9 @@ jsonData.cards.forEach((element, count) => {
         smallImage: res.data.image_uris.small,
         rarity: element.rarity || res.data.rarity,
         colours: res.data.colors.length > 0 ? res.data.colors : ["C"],
-        type_line: res.data.type_line,
         cmc: res.data.cmc,
+        mana_cost: res.data.mana_cost,
+        type_line: res.data.type_line,
         edhrec_uri: res.data.related_uris.edhrec,
         gatherer_uri: res.data.related_uris.gatherer
       });

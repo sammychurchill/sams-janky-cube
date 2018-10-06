@@ -92,7 +92,11 @@ export const mutations = {
   // },
   setCurrentSelectedCard(state, { playerID, card }) {
     const player = state.players[playerID];
-    player.currentSelectedCard = card.id;
+    if (!card) {
+      player.currentSelectedCard = undefined;
+    } else {
+      player.currentSelectedCard = card.id;
+    }
   },
   removeCardFromBooster(state, { boosterID, cardID }) {
     const index = state.boosters[boosterID].indexOf(cardID);
@@ -127,9 +131,9 @@ export const mutations = {
 export const getters = {
   players: state => state.playerList.map(playerID => state.players[playerID]),
   isStarted: state => state.isStarted,
-  boosterCards: state => playerID => {
+  boosterCards: state => (currentPlayerID, sortProp) => {
     //this fires when cards are hovered over. Need to investigate
-    const player = state.players[playerID];
+    const player = state.players[currentPlayerID];
     const boosterCardsArray = [];
     try {
       for (let cardID of state.boosters[player.currentBooster]) {
@@ -137,15 +141,18 @@ export const getters = {
           state.cards.filter(card => card.id === cardID)[0]
         );
       }
-      return boosterCardsArray;
+      return sortCards(boosterCardsArray, sortProp);
     } catch (error) {
       return [];
     }
   },
-  selectedCards: state => playerID => {
-    return state.players[playerID].selectedCards.map(
-      selectedCardID =>
-        state.cards.filter(card => card.id === selectedCardID)[0]
+  selectedCards: state => (currentPlayerID, sort) => {
+    return sortCards(
+      state.players[currentPlayerID].selectedCards.map(
+        selectedCardID =>
+          state.cards.filter(card => card.id === selectedCardID)[0]
+      ),
+      sort
     );
   },
   currentSelectedCard: state => playerID => {
@@ -284,6 +291,19 @@ function getTimeoutSynergy(card1, card2) {
 
 function nothing(o) {
   return o;
+}
+
+function sortCards(cardArray, sortProp) {
+  if (!sortProp) {
+    return cardArray;
+  }
+  const slotOrder = ["mythic", "rare", "uncommon", "common"];
+  if (sortProp === "rarity") {
+    cardArray = sortBy(cardArray, "rarity", { rarity: slotOrder });
+  } else {
+    cardArray = sortBy(cardArray, sortProp);
+  }
+  return cardArray;
 }
 
 // function synergyDBLookup(card1, card2) {

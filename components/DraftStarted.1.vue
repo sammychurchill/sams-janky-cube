@@ -41,135 +41,123 @@
         @click="confirmModalShow = false"/>
     </div>
     <br>
-    <div 
-      ref="playerBox"
-      class="buttons is-centered">
+    <div class="buttons is-centered">
       <span 
         v-for="player in players"
         :key="player.id"
         :class="[{'is-active': player.id === currentPlayerID}, {'is-loading': player.isLoading}]"
         class="button is-small is-primary is-unselectable"
-        @click="currentPlayerID = player.id; hoveredCardID = undefined"
+        @click="currentPlayerID = player.id; hoveredCardID = null"
       >
         {{ player.name }}
       </span>
     </div>
     <div class="container">
-      <nav class="level is-mobile">
-        <OrderDropDown @sort="setCurrentSort($event)"/>
-        <div class="level-right">
-          <div 
-            class="field level-item has-text-centered is-unselectable"
-            @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
-            <input 
-              :checked="selectedCardsCheckboxChecked"
-              type="checkbox" 
-              name="selectedCardsCheckbox" 
-              class="switch is-info is-rtl"
-            >
-            <label 
-              class="is-size-6 is-unselectable" 
-              for="selectedCardsCheckbox">
-              <small>Selected Cards</small>
-            </label>
-          </div>
-        </div>
-      </nav>
-      <div class="">
-        <div 
-          v-if="boosterCards(userPlayer).length > 0"
-          class="buttons is-centered">
-          <span
-            :disabled="buttonDisabled"
-            class="button is-small is-primary"
-            @click="passTurn('L')"
-          >
-            Pass Left
-          </span>
-          <span
-            :disabled="buttonDisabled"
-            class="button is-small is-primary"
-            @click="passTurn('R')"
-          >
-            Pass Right
-          </span>
-        </div>  
-        <div 
-          v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
-          class="buttons is-centered">
-          <span
-            :disabled="buttonDisabled"
-            class="button is-small is-primary"
-          >
-            Next Pack
-          </span>
-        </div>
+      <div 
+        class="field"
+        @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
+        <input 
+          :checked="selectedCardsCheckboxChecked"
+          type="checkbox" 
+          name="selectedCardsCheckbox" 
+          class="switch is-small is-rtl is-unselectable"
+        >
+        <label for="selectedCardsCheckbox is-unselectable">Selected Cards</label>
       </div>
-      <br>
-      <div v-if="selectedCardsCheckboxChecked">
-        <div class="columns is-mobile is-centered">
-          <div class="column is-half is-narrow">
-            <article 
-              v-for="card in selectedCards(currentPlayerID, sortProp)"
-              :key="card.id"
-              class="media"
-              @mouseover="hoveredCardID = card.id"
-              @click="selectCard(card.id);$store.dispatch('draft/logAction')"
-            >
-              <figure class="image">
-                <img
-                  :src="card.normalImage"
-                  class="image card-selected"
-                >
-              </figure>
-            </article>
-          </div>
+      <transition name="fade">
+        <div @click="hoveredCardID = null">
+          <img 
+            v-if="hoveredCardID" 
+            :src="getCardByID(hoveredCardID).smallImage"
+            height="300"
+            width="100"
+          >
         </div>
+      </transition>
+      <div v-if="selectedCardsCheckboxChecked">
+        <p
+          v-for="card in selectedCards(currentPlayerID)"
+          :key="card.id"
+          :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
+          class="subtitle is-size-7 is-unselectable card-list-item"
+          @mouseover="hoveredCardID = card.id"
+        >
+          {{ card.name }}
+        </p>
       </div>
       <div v-else>
-        <div class="columns is-mobile is-centered">
-          <div class="column is-half-touch is-one-fifth-desktop is-narrow">
-            <article 
-              v-for="card in boosterCards(currentPlayerID, sortProp)"
-              :key="card.id"
-              class="media"
-              @mouseover="hoveredCardID = card.id"
-              @click="selectCard(card.id);$store.dispatch('draft/logAction')"
-            >
-              <figure class="image">
-                <img
-                  :src="card.normalImage"
-                  :class="{'card-selected': card.id === selectedCardID}"
-                  class="image"
-                >
-              </figure>
-            </article>
-          </div>
-        </div>
+        <span
+          v-for="card in boosterCards(currentPlayerID)"
+          :key="card.id"
+          :class="{'has-text-weight-semibold': hoveredCardID === card.id}"
+          class="is-size-6 is-unselectable card-list-item"
+          @mouseover="hoveredCardID = card.id"
+          @click="selectCard(card.id);$store.dispatch('draft/logAction')"
+        >
+          <span 
+            v-if="currentSelectedCard(currentPlayerID) === card.id"
+            class="icon"
+          >
+            <i class="fas fa-star"/>
+          </span>
+          {{ card.name }}
+          <br>
+          <span
+            class="is-size-7"
+          >
+            {{ card.type_line }}
+          </span>
+          <br>
+        </span>
+      </div>
+    </div>
+    <div class="container footer-button">
+      <div 
+        v-if="boosterCards(userPlayer).length > 0"
+        class="buttons is-centered">
+        <span
+          :disabled="buttonDisabled"
+          class="button is-small is-primary"
+          @click="passTurn('L')"
+        >
+          Pass Left
+        </span>
+        <span
+          :disabled="buttonDisabled"
+          class="button is-small is-primary"
+          @click="passTurn('R')"
+        >
+          Pass Right
+        </span>
+      </div>  
+      <div 
+        v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
+        class="buttons is-centered">
+        <span
+          :disabled="buttonDisabled"
+          class="button is-small is-primary"
+        >
+          Next Pack
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import OrderDropDown from "~/components/OrderDropDown.vue";
 import { createNamespacedHelpers } from "vuex";
 const { mapGetters, mapActions, mapMutations } = createNamespacedHelpers(
   "draft"
 );
 
 export default {
-  components: {
-    OrderDropDown
-  },
   data() {
     return {
-      userPlayer: undefined,
+      userPlayer: null,
       currentPlayerID: 1,
-      hoveredCardID: undefined,
-      selectedCardID: undefined,
+      hoveredCardID: null,
+      selectedCardID: null,
       selectedCardsCheckboxChecked: false,
-      sortProp: "",
       passDirections: [
         { dir: "L", text: "Pass to the Left" },
         { dir: "R", text: "Pass to the Right" }
@@ -183,7 +171,7 @@ export default {
   computed: {
     buttonDisabled() {
       return !(
-        this.selectedCardID !== undefined &&
+        this.selectedCardID !== null &&
         this.currentPlayerID === this.userPlayer &&
         this.selectedCardsCheckboxChecked === false
       );
@@ -209,16 +197,6 @@ export default {
       }
     }
   },
-  created() {
-    if (process.browser) {
-      window.addEventListener("scroll", this.handleScroll);
-    }
-  },
-  destroyed() {
-    if (process.browser) {
-      window.removeEventListener("scroll", this.handleScroll);
-    }
-  },
   mounted() {
     this.showPageLoader("Pass to the Left");
     this.userPlayer = 1;
@@ -232,17 +210,6 @@ export default {
     }
   },
   methods: {
-    handleScroll() {
-      const bottom = this.$refs.playerBox.getBoundingClientRect().bottom;
-      const top = this.$refs.playerBox.getBoundingClientRect().top;
-      const height = this.$refs.playerBox.getBoundingClientRect().height;
-      // console.log(window.scrollY);
-      console.log(bottom, top, height);
-      console.log(bottom - top);
-    },
-    setCurrentSort(sort) {
-      this.sortProp = sort;
-    },
     showPageLoader(text) {
       const pageloader = this.$refs.pageloader;
       if (pageloader) {
@@ -270,8 +237,8 @@ export default {
     },
     selectCard(cardID) {
       if (this.selectedCardID === cardID) {
-        this.selectedCardID = undefined;
-        this.hoveredCardID = undefined;
+        this.selectedCardID = null;
+        this.hoveredCardID = null;
       } else {
         this.hoveredCardID = cardID;
         this.selectedCardID = cardID;
@@ -308,9 +275,10 @@ export default {
 .button.is-small
   border-color: $vapor-green;
 
-.card-selected
-  box-shadow: 0px 0px 10px 4px $vapor-green-75
-  border-radius: 5px;
+.footer-button
+  margin-top: 25%
 
-
+.card-list-item
+  margin-top: 5px
+  margin-bottom: 5px
 </style>

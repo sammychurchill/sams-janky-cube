@@ -5,8 +5,7 @@
       class="dropdown">
       <div class="dropdown-trigger">
         <button 
-          class="button" 
-          aria-haspopup="true" 
+          class="button is-info is-small"
           @click="dropDownActive = !dropDownActive"
         >
           <span>Order By</span>
@@ -72,8 +71,10 @@ export default {
 };
 </script>
 
-<style scoped>
-.rootDiv {
-  padding-bottom: 3%;
-}
+<style lang="sass" scoped>
+@import "~/assets/vars.sass"
+
+// .button
+//   box-shadow: 0px 0px 0px 1px $vapor-purple-75  
+
 </style>
