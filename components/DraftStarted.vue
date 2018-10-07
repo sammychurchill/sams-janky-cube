@@ -28,12 +28,19 @@
       :class="{'is-active': confirmModalShow}"
       class="modal"
     >
-      <div class="modal-background"/>
+      <div 
+        class="modal-background"
+        @click="confirmModalShow = false"
+      />
       <div class="modal-content">
         <div class="box">
-          <p class="title">Confirm your selection</p>
-          <p class="subtitle">fleshbag</p>
-          <button class="button is-primary">Confirm</button>
+          <p class="title">{{ modalTitle }}</p>
+          <p class="subtitle">{{ modalSubtitle }}</p>
+          <button 
+            class="button is-primary"
+            @click="confirmSelection">
+            {{ modalButtonText }}
+          </button>
         </div>
       </div>
       <button 
@@ -49,12 +56,14 @@
         :key="player.id"
         :class="[{'is-active': player.id === currentPlayerID}, {'is-loading': player.isLoading}]"
         class="button is-small is-primary is-unselectable"
-        @click="currentPlayerID = player.id; hoveredCardID = undefined"
+        @click="currentPlayerID = player.id"
       >
         {{ player.name }}
       </span>
     </div>
-    <div class="container">
+    <div 
+      :class="{sticky: scrollSticky}"
+      class="container">
       <nav class="level is-mobile">
         <OrderDropDown @sort="setCurrentSort($event)"/>
         <div class="level-right">
@@ -77,34 +86,36 @@
       </nav>
       <div class="">
         <div 
-          v-if="boosterCards(userPlayer).length > 0"
+          v-if="cardsLeft"
           class="buttons is-centered">
           <span
             :disabled="buttonDisabled"
             class="button is-small is-primary"
-            @click="passTurn('L')"
+            @click="passTurnClicked('L')"
           >
             Pass Left
           </span>
           <span
             :disabled="buttonDisabled"
             class="button is-small is-primary"
-            @click="passTurn('R')"
+            @click="passTurnClicked('R')"
           >
             Pass Right
           </span>
         </div>  
         <div 
           v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
-          class="buttons is-centered">
+          class="buttons is-centered"
+          @click="nextPackClicked">
           <span
-            :disabled="buttonDisabled"
             class="button is-small is-primary"
           >
             Next Pack
           </span>
         </div>
       </div>
+    </div>
+    <div class="container">
       <br>
       <div v-if="selectedCardsCheckboxChecked">
         <div class="columns is-mobile is-centered">
@@ -113,8 +124,6 @@
               v-for="card in selectedCards(currentPlayerID, sortProp)"
               :key="card.id"
               class="media"
-              @mouseover="hoveredCardID = card.id"
-              @click="selectCard(card.id);$store.dispatch('draft/logAction')"
             >
               <figure class="image">
                 <img
@@ -126,14 +135,14 @@
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else> <!-- this should broken down into mobile and desktop components
+                        and hidden if breakpoint -->
         <div class="columns is-mobile is-centered">
-          <div class="column is-half-touch is-one-fifth-desktop is-narrow">
+          <div class="column is-half is-narrow">
             <article 
-              v-for="card in boosterCards(currentPlayerID, sortProp)"
+              v-for="card in getBoosterCards"
               :key="card.id"
               class="media"
-              @mouseover="hoveredCardID = card.id"
               @click="selectCard(card.id);$store.dispatch('draft/logAction')"
             >
               <figure class="image">
@@ -164,10 +173,8 @@ export default {
   },
   data() {
     return {
-      userPlayer: undefined,
-      currentPlayerID: 1,
-      hoveredCardID: undefined,
-      selectedCardID: undefined,
+      userPlayer: 0,
+      currentPlayerID: 0,
       selectedCardsCheckboxChecked: false,
       sortProp: "",
       passDirections: [
@@ -177,11 +184,22 @@ export default {
       passIDX: 0,
       hasStarted: false,
       errorModalShow: false,
-      confirmModalShow: false
+      confirmModalShow: false,
+      modalTitle: "",
+      modalSubtitle: "",
+      modalButtonText: "",
+      scrollSticky: false
     };
   },
   computed: {
+    getBoosterCards() {
+      console.log(this.boosterCards(this.currentPlayerID));
+      return this.boosterCards(this.currentPlayerID, this.sortProp);
+    },
     buttonDisabled() {
+      if (this.cardsLeft && this.boosterCards(this.userPlayer) < 1) {
+        return false;
+      }
       return !(
         this.selectedCardID !== undefined &&
         this.currentPlayerID === this.userPlayer &&
@@ -190,6 +208,25 @@ export default {
     },
     passDirection() {
       return this.passDirections[this.passIDX];
+    },
+    cardsLeft() {
+      for (let player of this.players) {
+        if (this.boosterCards(player.id).length > 0) {
+          return true;
+        }
+      }
+      return false;
+    },
+    selectedCardID: {
+      get: function() {
+        return this.currentSelectedCard(this.currentPlayerID);
+      },
+      set: function(cardID) {
+        this.setCurrentSelectedCard({
+          playerID: this.currentPlayerID,
+          cardID: cardID
+        });
+      }
     },
     ...mapGetters([
       "players",
@@ -201,27 +238,12 @@ export default {
       "playerIsLoading"
     ])
   },
-  watch: {
-    currentPlayerID() {
-      const selectedCard = this.currentSelectedCard(this.currentPlayerID);
-      if (selectedCard) {
-        this.hoveredCardID = selectedCard;
-      }
-    }
-  },
   created() {
-    if (process.browser) {
-      window.addEventListener("scroll", this.handleScroll);
-    }
-  },
-  destroyed() {
-    if (process.browser) {
-      window.removeEventListener("scroll", this.handleScroll);
-    }
+    this.gameStart();
   },
   mounted() {
-    this.showPageLoader("Pass to the Left");
-    this.userPlayer = 1;
+    // this.showPageLoader("Pass to the Left");
+    this.userPlayer = 0;
     if (!this.hasStarted) {
       this.hasStarted = true;
       for (let player of this.players) {
@@ -232,14 +254,6 @@ export default {
     }
   },
   methods: {
-    handleScroll() {
-      const bottom = this.$refs.playerBox.getBoundingClientRect().bottom;
-      const top = this.$refs.playerBox.getBoundingClientRect().top;
-      const height = this.$refs.playerBox.getBoundingClientRect().height;
-      // console.log(window.scrollY);
-      console.log(bottom, top, height);
-      console.log(bottom - top);
-    },
     setCurrentSort(sort) {
       this.sortProp = sort;
     },
@@ -254,7 +268,14 @@ export default {
         }, 3000);
       }
     },
-    passTurn(direction) {
+    passTurnClicked(direction) {
+      if (this.buttonDisabled) {
+        return;
+      }
+      if (this.currentPlayerID !== this.userPlayer) {
+        this.confirmSelection();
+        return;
+      }
       const filterDir = this.passDirections.filter(
         el => el.dir.toUpperCase() === direction.toUpperCase()
       );
@@ -263,28 +284,33 @@ export default {
         this.errorModalShow = true;
         return;
       }
+      this.modalTitle = "Confirm your selection";
+      this.modalSubtitle = this.getCardByID(this.selectedCardID).name;
+      this.modalButtonText = "Confirm";
       this.confirmModalShow = true;
-      // this should be in next turn()
-      // this.passIDX = this.passIDX * -1 + 1; // for when no more boosters
-      // this.showPageLoader(text);
+    },
+    confirmSelection() {
+      this.passTurn(this.passDirection.dir);
+      this.showPageLoader(this.passDirection.text);
+      this.confirmModalShow = false;
+    },
+    nextPackClicked() {
+      this.passIDX = this.passIDX * -1 + 1;
+      this.nextPack(this.passDirection.dir);
+      this.showPageLoader(this.passDirection.text);
     },
     selectCard(cardID) {
+      if (this.userPlayer !== this.currentPlayerID) {
+        return;
+      }
       if (this.selectedCardID === cardID) {
         this.selectedCardID = undefined;
-        this.hoveredCardID = undefined;
       } else {
-        this.hoveredCardID = cardID;
         this.selectedCardID = cardID;
-      }
-      if (this.userPlayer === this.currentPlayerID) {
-        this.setCurrentSelectedCard({
-          playerID: this.currentPlayerID,
-          card: this.getCardByID(this.selectedCardID)
-        });
       }
     },
     ...mapMutations(["setCurrentSelectedCard"]),
-    ...mapActions(["CPUSelectCard"])
+    ...mapActions(["gameStart", "CPUSelectCard", "passTurn", "nextPack"])
   }
 };
 </script>
@@ -305,12 +331,16 @@ export default {
   margin-bottom: 10%;
 
 
-.button.is-small
+.button
   border-color: $vapor-green;
 
 .card-selected
   box-shadow: 0px 0px 10px 4px $vapor-green-75
   border-radius: 5px;
 
-
+.sticky
+  background-color: #fff
+  position: fixed;
+  top: 57px;
+  z-index: 10;
 </style>

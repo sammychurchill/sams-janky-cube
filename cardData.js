@@ -1,7 +1,7 @@
 var jsonData = require("./assets/json/cards.json");
 var fs = require("fs");
 var axios = require("axios");
-let cardData = [];
+let cardData = {};
 
 jsonData.cards.forEach((element, count) => {
   axios
@@ -11,7 +11,7 @@ jsonData.cards.forEach((element, count) => {
       )}`
     )
     .then(res => {
-      cardData.push({
+      cardData[count + 1] = {
         id: count + 1, //probably should use card id
         name: res.data.name,
         count: element.count,
@@ -25,7 +25,7 @@ jsonData.cards.forEach((element, count) => {
         type_line: res.data.type_line,
         edhrec_uri: res.data.related_uris.edhrec,
         gatherer_uri: res.data.related_uris.gatherer
-      });
+      };
     })
     .then(() => logStuff())
     .catch(err => console.log(err));

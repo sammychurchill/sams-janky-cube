@@ -3,6 +3,7 @@ import jsonData from "~/assets/json/cardData.json";
 
 export const state = () => ({
   cards: jsonData,
+  cardArray: Object.keys(jsonData),
   selectedColours: [],
   currentSort: ""
 });
@@ -32,17 +33,18 @@ export const getters = {
       return state.cards;
     } else {
       const filteredCards = [];
-      state.cards.forEach(card => {
+      for (let cardID of state.cardArray) {
+        const card = state.cards[cardID];
         let value = 0;
-        getters.selectedColours.forEach(c => {
-          if (card.colours.includes(c)) {
+        getters.selectedColours.forEach(colour => {
+          if (card.colours.includes(colour)) {
             value++;
           }
         });
         if (value < card.colours.length) {
           filteredCards.push(card);
         }
-      });
+      }
       return filteredCards;
     }
   },
