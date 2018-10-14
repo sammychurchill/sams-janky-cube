@@ -23,6 +23,7 @@ module.exports = {
     { src: "font-awesome/scss/font-awesome.scss", lang: "scss" }
   ],
   // plugins: [{ src: "~/plugins/localStorage.js", ssr: false }],
+  plugins: [{ src: "~/plugins/stickTo", ssr: false }],
   loading: { color: "#3B8070" },
   modules: [],
 

@@ -61,68 +61,70 @@
         {{ player.name }}
       </span>
     </div>
-    <div 
-      :class="{sticky: scrollSticky}"
-      class="container">
-      <nav class="level is-mobile">
-        <OrderDropDown @sort="setCurrentSort($event)"/>
-        <div class="level-right">
-          <div 
-            class="field level-item has-text-centered is-unselectable"
-            @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
-            <input 
-              :checked="selectedCardsCheckboxChecked"
-              type="checkbox" 
-              name="selectedCardsCheckbox" 
-              class="switch is-info is-rtl"
-            >
-            <label 
-              class="is-size-6 is-unselectable" 
-              for="selectedCardsCheckbox">
-              <small>Selected Cards</small>
-            </label>
+    <!-- <div v-stickto> -->
+    <div>
+      <div
+        class="container">
+        <nav class="level is-mobile">
+          <OrderDropDown @sort="setCurrentSort($event)"/>
+          <div class="level-right">
+            <div 
+              class="field level-item has-text-centered is-unselectable"
+              @click="selectedCardsCheckboxChecked = !selectedCardsCheckboxChecked">
+              <input 
+                :checked="selectedCardsCheckboxChecked"
+                type="checkbox" 
+                name="selectedCardsCheckbox" 
+                class="switch is-info is-rtl"
+              >
+              <label 
+                class="is-size-6 is-unselectable" 
+                for="selectedCardsCheckbox">
+                <small>Selected Cards</small>
+              </label>
+            </div>
           </div>
-        </div>
-      </nav>
-      <div class="">
-        <div 
-          v-if="cardsLeft"
-          class="buttons is-centered">
-          <span
-            :disabled="buttonDisabled"
-            class="button is-small is-primary"
-            @click="passTurnClicked('L')"
-          >
-            Pass Left
-          </span>
-          <span
-            :disabled="buttonDisabled"
-            class="button is-small is-primary"
-            @click="passTurnClicked('R')"
-          >
-            Pass Right
-          </span>
-        </div>  
-        <div 
-          v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
-          class="buttons is-centered"
-          @click="nextPackClicked">
-          <span
-            class="button is-small is-primary"
-          >
-            Next Pack
-          </span>
+        </nav>
+        <div>
+          <div 
+            v-if="cardsLeft"
+            class="buttons is-centered">
+            <span
+              :disabled="buttonDisabled"
+              class="button is-small is-primary"
+              @click="passTurnClicked('L')"
+            >
+              Pass Left
+            </span>
+            <span
+              :disabled="buttonDisabled"
+              class="button is-small is-primary"
+              @click="passTurnClicked('R')"
+            >
+              Pass Right
+            </span>
+          </div>  
+          <div 
+            v-else-if="getPlayerByID(currentPlayerID).boosters.length > 0"
+            class="buttons is-centered"
+            @click="nextPackClicked">
+            <span
+              class="button is-small is-primary"
+            >
+              Next Pack
+            </span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="container">
+    <div class="container top-container">
       <br>
       <div v-if="selectedCardsCheckboxChecked">
         <div class="columns is-mobile is-centered">
           <div class="column is-half is-narrow">
             <article 
-              v-for="card in selectedCards(currentPlayerID, sortProp)"
-              :key="card.id"
+              v-for="(card, key) in selectedCards(currentPlayerID, sortProp)"
+              :key="key"
               class="media"
             >
               <figure class="image">
@@ -140,8 +142,8 @@
         <div class="columns is-mobile is-centered">
           <div class="column is-half is-narrow">
             <article 
-              v-for="card in getBoosterCards"
-              :key="card.id"
+              v-for="(card, key) in getBoosterCards"
+              :key="key"
               class="media"
               @click="selectCard(card.id);$store.dispatch('draft/logAction')"
             >
@@ -183,17 +185,16 @@ export default {
       ],
       passIDX: 0,
       hasStarted: false,
+      open: true,
       errorModalShow: false,
       confirmModalShow: false,
       modalTitle: "",
       modalSubtitle: "",
-      modalButtonText: "",
-      scrollSticky: false
+      modalButtonText: ""
     };
   },
   computed: {
     getBoosterCards() {
-      console.log(this.boosterCards(this.currentPlayerID));
       return this.boosterCards(this.currentPlayerID, this.sortProp);
     },
     buttonDisabled() {
@@ -203,11 +204,20 @@ export default {
       return !(
         this.selectedCardID !== undefined &&
         this.currentPlayerID === this.userPlayer &&
-        this.selectedCardsCheckboxChecked === false
+        this.selectedCardsCheckboxChecked === false &&
+        this.isLoading !== true
       );
     },
     passDirection() {
       return this.passDirections[this.passIDX];
+    },
+    isLoading() {
+      for (let player of this.players) {
+        if (player.isLoading) {
+          return true;
+        }
+      }
+      return false;
     },
     cardsLeft() {
       for (let player of this.players) {
@@ -242,7 +252,7 @@ export default {
     this.gameStart();
   },
   mounted() {
-    // this.showPageLoader("Pass to the Left");
+    this.showPageLoader("Pass to the Left");
     this.userPlayer = 0;
     if (!this.hasStarted) {
       this.hasStarted = true;
@@ -338,9 +348,6 @@ export default {
   box-shadow: 0px 0px 10px 4px $vapor-green-75
   border-radius: 5px;
 
-.sticky
+.container
   background-color: #fff
-  position: fixed;
-  top: 57px;
-  z-index: 10;
 </style>

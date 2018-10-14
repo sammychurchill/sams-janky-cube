@@ -2,37 +2,50 @@ var jsonData = require("./assets/json/cards.json");
 var fs = require("fs");
 var axios = require("axios");
 let cardData = {};
+let count = 1;
 
-jsonData.cards.forEach((element, count) => {
-  axios
-    .get(
+const getCardData = async cardName => {
+  try {
+    return await axios.get(
       `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(
-        element.name
+        cardName
       )}`
-    )
-    .then(res => {
-      cardData[count + 1] = {
-        id: count + 1, //probably should use card id
-        name: res.data.name,
-        count: element.count,
-        largeImage: res.data.image_uris.large,
-        normalImage: res.data.image_uris.normal,
-        smallImage: res.data.image_uris.small,
-        rarity: element.rarity || res.data.rarity,
-        colours: res.data.colors.length > 0 ? res.data.colors : ["C"],
-        cmc: res.data.cmc,
-        mana_cost: res.data.mana_cost,
-        type_line: res.data.type_line,
-        edhrec_uri: res.data.related_uris.edhrec,
-        gatherer_uri: res.data.related_uris.gatherer
-      };
-    })
-    .then(() => logStuff())
-    .catch(err => console.log(err));
-});
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-function logStuff() {
-  // console.log(JSON.stringify(cardData))
+async function getCards(card) {
+  console.log(card.name);
+  const res = await getCardData(card.name);
+  let cardCount = 1;
+  // cardCount = res.data.rarity === "common" ? 5 : card.count;
+  // cardCount = res.data.rarity === "uncommon" ? 3 : cardCount;
+  for (let i = 0; i < cardCount; i++) {
+    cardData[count] = {
+      id: count,
+      cardID: res.data.id,
+      name: res.data.name,
+      count: card.count,
+      largeImage: res.data.image_uris.large,
+      normalImage: res.data.image_uris.normal,
+      smallImage: res.data.image_uris.small,
+      rarity: card.rarity || res.data.rarity,
+      colours: res.data.colors.length > 0 ? res.data.colors : ["C"],
+      cmc: res.data.cmc,
+      mana_cost: res.data.mana_cost,
+      type_line: res.data.type_line,
+      edhrec_uri: res.data.related_uris.edhrec,
+      gatherer_uri: res.data.related_uris.gatherer
+    };
+    count++;
+    console.log(Object.keys(cardData).length);
+  }
+}
+async function main() {
+  const promises = jsonData.map(card => getCards(card));
+  await Promise.all(promises);
   fs.writeFile(
     "./assets/json/cardData.json",
     JSON.stringify(cardData),
@@ -43,3 +56,5 @@ function logStuff() {
     }
   );
 }
+
+main();

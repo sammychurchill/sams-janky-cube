@@ -12,6 +12,7 @@ import { setContext, getLocation, getRouteData } from './utils'
 import { createStore } from './store.js'
 
 /* Plugins */
+import nuxt_plugin_stickTo_76243af5 from 'nuxt_plugin_stickTo_76243af5' // Source: ../plugins/stickTo (ssr: false)
 
 
 // Component: <no-ssr>
@@ -151,6 +152,9 @@ async function createApp (ssrContext) {
   // Plugin execution
   
   
+  if (process.browser) { 
+    if (typeof nuxt_plugin_stickTo_76243af5 === 'function') await nuxt_plugin_stickTo_76243af5(app.context, inject)
+  }
 
   // If server-side, wait for async component to be resolved first
   if (process.server && ssrContext && ssrContext.url) {

@@ -1,102 +1,110 @@
 import sortBy from "sort-array";
 import cardData from "~/assets/json/cardData.json";
+import axios from "axios";
 
 export const state = () => ({
   cards: cardData,
-  isStarted: true,
-  players: {
-    0: {
-      id: 0,
-      selectedCards: [],
-      colourIdentity: [],
-      playerType: "human",
-      name: "Player",
-      boosters: [0, 2],
-      initRoundBooster: 0,
-      currentBooster: 0,
-      nextBooster: 3,
-      currentSelectedCard: null,
-      isLoading: false
-    },
-    1: {
-      id: 1,
-      selectedCards: [],
-      colourIdentity: [],
-      playerType: "cpu",
-      name: "CPU1",
-      boosters: [3, 4],
-      initRoundBooster: 3,
-      currentBooster: 3,
-      nextBooster: 5,
-      currentSelectedCard: null,
-      isLoading: false
-    },
-    2: {
-      id: 2,
-      selectedCards: [],
-      colourIdentity: ["g"],
-      playerType: "cpu",
-      name: "CPU2",
-      boosters: [5, 6],
-      initRoundBooster: 5,
-      currentBooster: 5,
-      nextBooster: 7,
-      currentSelectedCard: null,
-      isLoading: false
-    },
-    3: {
-      id: 3,
-      selectedCards: [],
-      colourIdentity: ["w"],
-      playerType: "cpu",
-      name: "CPU3",
-      boosters: [7, 8],
-      initRoundBooster: 7,
-      currentBooster: 7,
-      nextBooster: 9,
-      currentSelectedCard: null,
-      isLoading: false
-    },
-    4: {
-      id: 4,
-      selectedCards: [30],
-      colourIdentity: ["U", "R"],
-      playerType: "cpu",
-      name: "CPU4",
-      boosters: [9, 10],
-      initRoundBooster: 9,
-      currentBooster: 9,
-      nextBooster: 11,
-      currentSelectedCard: null,
-      isLoading: false
-    },
-    5: {
-      id: 5,
-      selectedCards: [28],
-      colourIdentity: ["R", "U"],
-      playerType: "cpu",
-      name: "CPU5",
-      boosters: [11, 12],
-      initRoundBooster: 11,
-      currentBooster: 11,
-      nextBooster: 0,
-      currentSelectedCard: null,
-      isLoading: false
+  cardList: Object.values(cardData).map(card => {
+    for (let i = 0; i < card.count; i++) {
+      return card.id;
     }
-  },
-  playerList: [0, 1, 2, 3, 4, 5], //
-  // boosters: [
-  //   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  //   [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-  //   [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
-  //   [31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
-  //   [31, 42, 43, 44, 45, 46, 47, 48, 49, 50],
-  //   [51, 52, 53, 54, 55, 56, 57, 58, 59, 30],
-  //   [61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
-  // ]
-  // boosters: [[9], [11, 12], [21, 22], [31, 32], [31, 42], [], []]
-  boosters: []
+  }),
+  isStarted: true,
+  boosters: [],
+  players: {},
+  playerList: []
 });
+// players: {
+//   0: {
+//     id: 0,
+//     selectedCards: [],
+//     colourIdentity: [],
+//     playerType: "human",
+//     name: "Player",
+//     boosters: [0, 2],
+//     initRoundBooster: 0,
+//     currentBooster: 0,
+//     nextBooster: 3,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   },
+//   1: {
+//     id: 1,
+//     selectedCards: [],
+//     colourIdentity: [],
+//     playerType: "cpu",
+//     name: "CPU1",
+//     boosters: [3, 4],
+//     initRoundBooster: 3,
+//     currentBooster: 3,
+//     nextBooster: 5,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   },
+//   2: {
+//     id: 2,
+//     selectedCards: [],
+//     colourIdentity: ["g"],
+//     playerType: "cpu",
+//     name: "CPU2",
+//     boosters: [5, 6],
+//     initRoundBooster: 5,
+//     currentBooster: 5,
+//     nextBooster: 7,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   },
+//   3: {
+//     id: 3,
+//     selectedCards: [],
+//     colourIdentity: ["w"],
+//     playerType: "cpu",
+//     name: "CPU3",
+//     boosters: [7, 8],
+//     initRoundBooster: 7,
+//     currentBooster: 7,
+//     nextBooster: 9,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   },
+//   4: {
+//     id: 4,
+//     selectedCards: [30],
+//     colourIdentity: ["U", "R"],
+//     playerType: "cpu",
+//     name: "CPU4",
+//     boosters: [9, 10],
+//     initRoundBooster: 9,
+//     currentBooster: 9,
+//     nextBooster: 11,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   },
+//   5: {
+//     id: 5,
+//     selectedCards: [28],
+//     colourIdentity: ["R", "U"],
+//     playerType: "cpu",
+//     name: "CPU5",
+//     boosters: [11, 12],
+//     initRoundBooster: 11,
+//     currentBooster: 11,
+//     nextBooster: 0,
+//     currentSelectedCard: null,
+//     isLoading: false
+//   }
+// },
+// playerList: [0, 1, 2, 3, 4, 5]
+// boosters: [
+//   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+//   [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+//   [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+//   [31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
+//   [31, 42, 43, 44, 45, 46, 47, 48, 49, 50],
+//   [51, 52, 53, 54, 55, 56, 57, 58, 59, 30],
+//   [61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
+// ]
+// boosters: [[9], [11, 12], [21, 22], [31, 32], [31, 42], [], []]
 
 export const getters = {
   players: state => state.playerList.map(playerID => state.players[playerID]),
@@ -141,6 +149,10 @@ export const getters = {
 };
 
 export const mutations = {
+  initialisePlayers(state, players) {
+    state.players = players;
+    state.playerList = Object.keys(players);
+  },
   setBoosters(state, boosters) {
     state.boosters = boosters;
   },
@@ -156,20 +168,10 @@ export const mutations = {
     }
   },
   removeCardFromBooster(state, { boosterID, cardID }) {
-    console.log("removeCardFromBooster - boosterID, CardID", {
-      boosterID,
-      cardID
-    });
     const index = state.boosters[boosterID].indexOf(cardID);
-    console.log("removeCardFromBooster index", index);
     if (index > -1) {
       state.boosters[boosterID].splice(index, 1);
     }
-    console.log(
-      "removeCardFromBooster bossterID, boosterpack",
-      boosterID,
-      state.boosters[boosterID]
-    );
   },
   playerSelectCard(state, { playerID, cardID }) {
     state.players[playerID].selectedCards.push(cardID);
@@ -206,6 +208,8 @@ export const mutations = {
     state.players[playerID].boosters = state.players[playerID].boosters.filter(
       boosterID => boosterID !== state.players[playerID].initRoundBooster
     );
+  },
+  clearCurrentBooster(state, playerID) {
     state.players[playerID].currentBooster = undefined;
   },
   pickBooster(state, playerID) {
@@ -228,18 +232,10 @@ export const actions = {
     console.log("test");
   },
   gameStart({ commit, getters }) {
-    const outer = [];
-    let inner = [];
-    for (let index = 1; index < 51; index++) {
-      inner.push(index);
-      if (index % 2 === 0) {
-        outer.push(inner);
-        inner = [];
-      }
-    }
-    commit("setBoosters", outer);
+    commit("initialisePlayers", createUsers("Sam", 5));
+    commit("setBoosters", createBoosters(cardData, 6));
 
-    let boosterCount = 13;
+    let boosterCount = 0;
     for (let player of getters.players) {
       for (let i = 0; i < 2; i++) {
         commit("setPlayerBoosters", {
@@ -248,6 +244,11 @@ export const actions = {
         });
         boosterCount++;
       }
+      commit("pickBooster", player.id);
+      commit("removeCurrentBooster", player.id);
+    }
+    for (let player of getters.players) {
+      commit("getNextBooster", { playerID: player.id, direction: "L" });
     }
     // create players
     // list players
@@ -260,11 +261,6 @@ export const actions = {
   },
   passTurn({ commit, getters, dispatch }, direction) {
     for (let player of getters.players) {
-      console.log(
-        "passturn - player.selectedcard",
-        player.name,
-        player.currentSelectedCard
-      );
       if (getters.boosterCards(player.id).length > 0) {
         commit("removeCardFromBooster", {
           boosterID: player.currentBooster,
@@ -290,6 +286,7 @@ export const actions = {
   nextPack({ commit, getters, dispatch }, direction) {
     for (let player of getters.players) {
       commit("removeCurrentBooster", player.id);
+      commit("clearCurrentBooster", player.id);
       commit("pickBooster", player.id);
       if (player.playerType !== "human") {
         dispatch("CPUSelectCard", player.id);
@@ -300,16 +297,10 @@ export const actions = {
     }
   },
   async CPUSelectCard({ commit, getters }, playerID) {
-    console.log("CPUSelectCard - playerID", playerID);
     const boosterCards = getters.boosterCards(playerID);
     if (boosterCards.length < 1) {
       return;
     }
-    console.log(
-      "CPUSelectCard - playerID, boosterCards",
-      playerID,
-      boosterCards
-    );
     const selectedCards = getters.selectedCards(playerID);
     const colourIdentity = getters.getColourIdentityByID(playerID);
     //
@@ -318,26 +309,41 @@ export const actions = {
     });
     //
     commit("isLoadingStarted", playerID);
+    console.log("--- loading started", playerID);
     //
     for (let cardValue of cardValueArrary) {
+      console.log(cardValue.card.name, cardValue.value);
+
       cardValue.value += getRarityValue(cardValue.card);
+      console.log("rarity", cardValue.card.name, cardValue.value);
+
       cardValue.value += getColourIdentityValue(cardValue.card, colourIdentity);
+      console.log("colour", cardValue.card.name, cardValue.value);
+
       cardValue.value += getCMCValue(cardValue.card);
+      console.log("cmc", cardValue.card.name, cardValue.value);
+
+      let synergies = [];
       for (let card of selectedCards) {
-        const synergyPercentage =
-          (await getTimeoutSynergy(cardValue.card, card)) / 100;
-        cardValue.value += cardValue.value * synergyPercentage;
+        const synergy = await getSynergy(cardValue.card, card);
+        synergies.push(synergy);
       }
+      console.log("synergies", cardValue.card.name, synergies);
+      const sum = synergies.reduce((acc, val) => {
+        return val + acc;
+      }, 0);
+      console.log("avg", sum / synergies.length);
+      const avg = cardValue.value * (sum / synergies.length);
+      if (avg && avg > 0) {
+        cardValue.value = cardValue.value * ((avg + 100) / 100);
+      }
+      console.log("after syn", cardValue.card.name, cardValue.value);
+      // should test if synergy value is there. if not display error somewhere
     }
-    // check db if recorded synergy (card1, card2)
-    // if not recorded synergy
-    //   set isLoading true
-    //   api lookup synergy
-    //   write synergy to db
 
     const sortedCardValueArray = sortBy(cardValueArrary, "value").reverse();
     const selectedCard = sortedCardValueArray[0].card;
-    console.log("selectedCard", playerID, selectedCard);
+    console.log("--- loading Finished", playerID);
     commit("isLoadingFinished", playerID);
     commit("setCurrentSelectedCard", {
       playerID,
@@ -345,6 +351,85 @@ export const actions = {
     });
   }
 };
+
+function createUsers(humanPlayerName, noCPUPlayers) {
+  const players = {};
+  players[0] = {
+    id: 0,
+    selectedCards: [],
+    colourIdentity: [],
+    playerType: "human",
+    name: humanPlayerName,
+    boosters: [],
+    initRoundBooster: undefined,
+    currentBooster: undefined,
+    nextBooster: undefined,
+    currentSelectedCard: undefined,
+    isLoading: false
+  };
+  for (let i = 1; i < noCPUPlayers + 1; i++) {
+    players[i] = {
+      id: i,
+      selectedCards: [],
+      colourIdentity: [],
+      playerType: "cpu",
+      name: `CPU${i}`,
+      boosters: [],
+      initRoundBooster: undefined,
+      currentBooster: undefined,
+      nextBooster: undefined,
+      currentSelectedCard: undefined,
+      isLoading: false
+    };
+  }
+  return players;
+}
+
+function createBoosters(cards, noPlayers) {
+  const boosters = [];
+  nothing(noPlayers);
+  let { rares, uncommons, commons } = groupRarity(cards);
+
+  for (let index = 0; index < 6 * 4; index++) {
+    let booster = Array.concat(
+      fillBooster(rares, 1),
+      fillBooster(uncommons, 3),
+      fillBooster(commons, 10)
+    );
+    boosters.push(booster);
+    booster = [];
+  }
+  return boosters;
+}
+
+function getRand(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function groupRarity(cards) {
+  const commons = [];
+  const uncommons = [];
+  const rares = [];
+  Object.values(cards).forEach(card => {
+    card.rarity === "mythic" || card.rarity === "rare"
+      ? rares.push(card)
+      : null;
+    card.rarity === "uncommon" ? uncommons.push(card) : null;
+    card.rarity === "common" ? commons.push(card) : null;
+  });
+  return { rares, uncommons, commons };
+}
+
+function fillBooster(cards, numberOfChoices) {
+  const booster = [];
+  while (booster.length < numberOfChoices) {
+    let choice = getRand(cards);
+    if (!booster.includes(choice.id)) {
+      booster.push(choice.id);
+    }
+  }
+  return booster;
+}
 
 function getNextBoosterDirectionValue(direction) {
   if (direction.toUpperCase() === "L") {
@@ -394,13 +479,25 @@ function getCMCValue(card) {
   return value;
 }
 
-function getTimeoutSynergy(card1, card2) {
-  return new Promise(resolve =>
-    setTimeout(() => {
-      nothing({ card1, card2 });
-      resolve(33);
-    }, 300)
-  );
+// function getTimeoutSynergy(card1, card2) {
+//   return new Promise(resolve =>
+//     setTimeout(() => {
+//       nothing({ card1, card2 });
+//       resolve(33);
+//     }, 300)
+//   );
+// }
+
+function getSynergy(card1, card2) {
+  return axios
+    .post("/syn", { card1, card2 })
+    .then(res => {
+      console.log("getSynergyRes", res);
+      return res.data.synergy;
+    })
+    .catch(err => {
+      console.log(err);
+    });
 }
 
 function nothing(o) {
