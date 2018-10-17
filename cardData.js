@@ -1,8 +1,33 @@
 var jsonData = require("./assets/json/cards.json");
+const { Pool } = require("pg");
 var fs = require("fs");
 var axios = require("axios");
 let cardData = {};
 let count = 1;
+
+const pool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL || "postgres://localhost:5432/synergies",
+  ssl: false // why is this false
+});
+
+async function query(q) {
+  const client = await pool.connect();
+  let res;
+  try {
+    await client.query("BEGIN");
+    try {
+      res = await client.query(q);
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
+  } finally {
+    client.release();
+  }
+  return res;
+}
 
 const getCardData = async cardName => {
   try {
@@ -55,6 +80,10 @@ async function main() {
       }
     }
   );
+}
+
+async function writeToDB(params) {
+  //
 }
 
 main();

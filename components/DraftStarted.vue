@@ -346,7 +346,7 @@ export default {
 
 .card-selected
   box-shadow: 0px 0px 10px 4px $vapor-green-75
-  border-radius: 5px;
+  border-radius: 6px;
 
 .container
   background-color: #fff

@@ -1,6 +1,9 @@
 import sortBy from "sort-array";
 import cardData from "~/assets/json/cardData.json";
 import axios from "axios";
+import { log } from "util";
+const NodeCache = require("node-cache");
+const synergyCache = new NodeCache();
 
 export const state = () => ({
   cards: cardData,
@@ -230,6 +233,7 @@ export const mutations = {
 export const actions = {
   logAction() {
     console.log("test");
+    console.log(synergyCache.getStats());
   },
   gameStart({ commit, getters }) {
     commit("initialisePlayers", createUsers("Sam", 5));
@@ -323,17 +327,31 @@ export const actions = {
       cardValue.value += getCMCValue(cardValue.card);
       console.log("cmc", cardValue.card.name, cardValue.value);
 
-      let synergies = [];
+      const synergies = [];
       for (let card of selectedCards) {
-        const synergy = await getSynergy(cardValue.card, card);
-        synergies.push(synergy);
+        const synSortedCardArray = arrayAndSort(card, cardValue.card);
+        const key = `${synSortedCardArray[0].id}_${synSortedCardArray[1].id}`;
+        const cachedValue = synergyCache.get(key);
+        if (cachedValue == undefined) {
+          console.log("-- Miss", card.name, cardValue.card.name);
+          const synergy = await getSynergy(cardValue.card, card);
+          synergyCache.set(key, synergy, 60 * 60 * 1);
+          synergies.push(synergy);
+        } else {
+          console.log("-- Hit", card.name, cardValue.card.name);
+          synergies.push(cachedValue);
+        }
       }
       console.log("synergies", cardValue.card.name, synergies);
-      const sum = synergies.reduce((acc, val) => {
+
+      const synergiesSum = synergies.reduce((acc, val) => {
         return val + acc;
       }, 0);
-      console.log("avg", sum / synergies.length);
-      const avg = cardValue.value * (sum / synergies.length);
+      console.log("synergiesSum", synergiesSum);
+      console.log("synergies length", synergies.length);
+      console.log("avg", synergiesSum / synergies.length);
+
+      const avg = synergiesSum / synergies.length;
       if (avg && avg > 0) {
         cardValue.value = cardValue.value * ((avg + 100) / 100);
       }
@@ -479,15 +497,6 @@ function getCMCValue(card) {
   return value;
 }
 
-// function getTimeoutSynergy(card1, card2) {
-//   return new Promise(resolve =>
-//     setTimeout(() => {
-//       nothing({ card1, card2 });
-//       resolve(33);
-//     }, 300)
-//   );
-// }
-
 function getSynergy(card1, card2) {
   return axios
     .post("/syn", { card1, card2 })
@@ -498,6 +507,10 @@ function getSynergy(card1, card2) {
     .catch(err => {
       console.log(err);
     });
+}
+
+function arrayAndSort(card1, card2) {
+  return [card1, card2].sort((a, b) => a.id - b.id);
 }
 
 function nothing(o) {
